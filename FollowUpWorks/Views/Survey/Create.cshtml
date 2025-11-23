@@ -1,0 +1,144 @@
+﻿@model FollowUpWorks.DTOs.SurveyClassDTO
+@{
+    ViewData["Title"] = "Crear Encuesta";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex align-items-center mb-4">
+                <a asp-action="Index" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h3 mb-0">Crear Nueva Encuesta</h1>
+                    <p class="text-muted mb-0">Configura tu encuesta y agrega preguntas</p>
+                </div>
+            </div>
+
+            <form asp-action="Create" method="post" id="surveyForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="questionsJson" id="questionsJson" />
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Información General</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label asp-for="Title" class="form-label fw-semibold">Título *</label>
+                                <input asp-for="Title" class="form-control form-control-lg" placeholder="Ej: Encuesta de Satisfacción" required />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="IsActive" class="form-label fw-semibold">Estado</label>
+                                <select asp-for="IsActive" class="form-select form-select-lg">
+                                    <option value="true">Activa</option>
+                                    <option value="false">Inactiva</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <label asp-for="Description" class="form-label fw-semibold">Descripción</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Describe el propósito..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Preguntas</h5>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#questionModal">
+                            <i class="bi bi-plus-lg me-1"></i>Agregar Pregunta
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="questionsContainer">
+                            <div id="emptyState" class="text-center py-5">
+                                <i class="bi bi-question-circle text-muted display-4"></i>
+                                <h6 class="mt-3 text-muted">No hay preguntas agregadas</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="bi bi-check-lg me-2"></i>Crear Encuesta
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Question Modal -->
+<div class="modal fade" id="questionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Agregar Pregunta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Texto de la Pregunta *</label>
+                    <input type="text" id="questionText" class="form-control" placeholder="Escribe tu pregunta..." />
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Tipo</label>
+                        <select id="questionType" class="form-select">
+                            <option value="SingleChoice">Opción Única</option>
+                            <option value="MultipleChoice">Opción Múltiple</option>
+                            <option value="Text">Texto Libre</option>
+                            <option value="Rating">Calificación (1-5)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">¿Obligatoria?</label>
+                        <select id="questionRequired" class="form-select">
+                            <option value="true">Sí</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="optionsSection">
+                    <label class="form-label fw-semibold">Opciones de Respuesta</label>
+                    <div id="optionsContainer">
+                        <div class="input-group mb-2">
+                            <span class="input-group-text">1</span>
+                            <input type="text" class="form-control option-input" placeholder="Opción 1">
+                            <button type="button" class="btn btn-outline-danger remove-option"><i class="bi bi-x"></i></button>
+                        </div>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text">2</span>
+                            <input type="text" class="form-control option-input" placeholder="Opción 2">
+                            <button type="button" class="btn btn-outline-danger remove-option"><i class="bi bi-x"></i></button>
+                        </div>
+                    </div>
+                    <button type="button" id="addOptionBtn" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-plus me-1"></i>Agregar Opción
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveQuestionBtn">
+                    <i class="bi bi-check-lg me-1"></i>Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/SurveyScript.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            SurveyEditor.init([]);
+        });
+    </script>
+}

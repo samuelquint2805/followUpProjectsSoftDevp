@@ -1,0 +1,225 @@
+﻿@model FollowUpWorks.DTOs.ReservationClassDTO
+@{
+    ViewData["Title"] = "Editar Reserva";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a asp-action="Index" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-pencil-square me-2 text-warning"></i>Editar Reserva
+                    </h1>
+                    <p class="text-muted mb-0">Modifica los datos de la reserva existente</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Formulario Principal -->
+                <div class="col-lg-7">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="bi bi-calendar-check me-2"></i>
+                                Reserva #@Model.idReservation.ToString().Substring(0, 8)...
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="Edit" method="post" id="reservationForm">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" asp-for="idReservation" />
+
+                                <!-- Nombre del Cliente -->
+                                <div class="mb-4">
+                                    <label asp-for="Username" class="form-label fw-semibold">
+                                        <i class="bi bi-person me-1 text-warning"></i>Nombre del Cliente *
+                                    </label>
+                                    <input asp-for="Username" class="form-control form-control-lg"
+                                           placeholder="Ingrese el nombre completo" required />
+                                    <span asp-validation-for="Username" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Fecha y Hora -->
+                                <div class="mb-4">
+                                    <label asp-for="ReservationDate" class="form-label fw-semibold">
+                                        <i class="bi bi-calendar-event me-1 text-warning"></i>Fecha y Hora *
+                                    </label>
+                                    <input asp-for="ReservationDate" type="datetime-local"
+                                           class="form-control form-control-lg"
+                                           id="reservationDateTime" required />
+                                    <span asp-validation-for="ReservationDate" class="text-danger small"></span>
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Horario disponible: Lunes a Viernes 8:00 AM - 6:00 PM
+                                    </div>
+                                </div>
+
+                                <!-- Número de Personas -->
+                                <div class="mb-4">
+                                    <label asp-for="NumberOfGuests" class="form-label fw-semibold">
+                                        <i class="bi bi-people me-1 text-warning"></i>Número de Personas *
+                                    </label>
+                                    <div class="input-group">
+                                        <button type="button" class="btn btn-outline-secondary" id="btnDecrease">
+                                            <i class="bi bi-dash-lg"></i>
+                                        </button>
+                                        <input asp-for="NumberOfGuests" type="number"
+                                               class="form-control form-control-lg text-center"
+                                               min="1" max="20" id="guestsInput" />
+                                        <button type="button" class="btn btn-outline-secondary" id="btnIncrease">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="NumberOfGuests" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Información de Contacto -->
+                                <div class="mb-4">
+                                    <label asp-for="ContactInfo" class="form-label fw-semibold">
+                                        <i class="bi bi-telephone me-1 text-warning"></i>Información de Contacto *
+                                    </label>
+                                    <input asp-for="ContactInfo" class="form-control form-control-lg"
+                                           placeholder="Email o teléfono" required />
+                                    <span asp-validation-for="ContactInfo" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Botones -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-between pt-3 border-top">
+                                    <button type="button" class="btn btn-outline-danger btn-lg" id="btnDelete">
+                                        <i class="bi bi-trash me-2"></i>Eliminar
+                                    </button>
+                                    <div>
+                                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg me-2">
+                                            <i class="bi bi-x-circle me-2"></i>Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-warning btn-lg">
+                                            <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Lateral -->
+                <div class="col-lg-5">
+                    <!-- Estado Actual -->
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Estado de la Reserva</h6>
+                        </div>
+                        <div class="card-body text-center">
+                            @{
+                                var isPast = Model.ReservationDate < DateTime.Now;
+                                var isToday = Model.ReservationDate.Date == DateTime.Today;
+                                var statusClass = isPast ? "bg-secondary" : (isToday ? "bg-success" : "bg-primary");
+                                var statusText = isPast ? "Completada" : (isToday ? "Hoy" : "Próxima");
+                                var statusIcon = isPast ? "check-circle" : (isToday ? "calendar-check" : "clock");
+                            }
+                            <i class="bi bi-@statusIcon display-4 text-@(isPast ? "secondary" : (isToday ? "success" : "primary"))"></i>
+                            <h4 class="mt-2">
+                                <span class="badge @statusClass fs-5">@statusText</span>
+                            </h4>
+                            @if (!isPast)
+                            {
+                                var timeUntil = Model.ReservationDate - DateTime.Now;
+                                <p class="text-muted mb-0">
+                                    @if (timeUntil.Days > 0)
+                                    {
+                                        <text>En @timeUntil.Days días</text>
+                                    }
+                                    else if (timeUntil.Hours > 0)
+                                    {
+                                        <text>En @timeUntil.Hours horas</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Próximamente</text>
+                                    }
+                                </p>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Resumen Actualizado -->
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Vista Previa</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Cliente:</span>
+                                <strong id="summaryName">@Model.Username</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Fecha:</span>
+                                <strong id="summaryDate">@Model.ReservationDate.ToString("dd MMM yyyy")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Hora:</span>
+                                <strong id="summaryTime">@Model.ReservationDate.ToString("hh:mm tt")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Personas:</span>
+                                <strong id="summaryGuests">@Model.NumberOfGuests</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Historial -->
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6><i class="bi bi-clock-history text-secondary me-2"></i>Información</h6>
+                            <ul class="small mb-0 ps-3 text-muted">
+                                <li>ID: @Model.idReservation</li>
+                                <li>Última modificación: @DateTime.Now.ToString("dd/MM/yyyy")</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="bi bi-trash display-4 text-danger"></i>
+                <h5 class="mt-3">¿Eliminar esta reserva?</h5>
+                <p class="mb-1">Cliente: <strong>@Model.Username</strong></p>
+                <p class="text-muted">Fecha: @Model.ReservationDate.ToString("dd/MM/yyyy HH:mm")</p>
+                <p class="text-muted small">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x me-1"></i>Cancelar
+                </button>
+                <form asp-action="Delete" asp-route-id="@Model.idReservation" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 
+
+@section Scripts {
+    <script src="~/js/ReservationScript.js"></script>
+}

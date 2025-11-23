@@ -1,0 +1,443 @@
+﻿@model IEnumerable<FollowUpWorks.Models.RecipeClass>
+
+@{
+    ViewData["Title"] = "Mis Recetas";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-book"></i> Mis Recetas</h1>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Nueva Receta
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Errors"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Errors"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Sección de Filtros -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <i class="bi bi-funnel"></i> Filtros de Búsqueda
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="searchName" class="form-label">Buscar por nombre</label>
+                    <input type="text" class="form-control" id="searchName" placeholder="Nombre de la receta...">
+                </div>
+                <div class="col-md-4">
+                    <label for="filterDishType" class="form-label">Tipo de Plato</label>
+                    <select class="form-select" id="filterDishType">
+                        <option value="">Todos</option>
+                        <option value="Dulce">Dulce</option>
+                        <option value="Salado">Salado</option>
+                        <option value="Entrada">Entrada</option>
+                        <option value="Postre">Postre</option>
+                        <option value="Bebida">Bebida</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="filterIngredientCategory" class="form-label">Categoría de Ingrediente</label>
+                    <select class="form-select" id="filterIngredientCategory">
+                        <option value="">Todos</option>
+                        <option value="Carne">Carne</option>
+                        <option value="Pollo">Pollo</option>
+                        <option value="Pescado">Pescado</option>
+                        <option value="Granos">Granos</option>
+                        <option value="Vegetales">Vegetales</option>
+                        <option value="Frutas">Frutas</option>
+                        <option value="Lácteos">Lácteos</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <label for="filterIngredient" class="form-label">Buscar por ingrediente</label>
+                    <input type="text" class="form-control" id="filterIngredient" placeholder="Ej: tomate, cebolla...">
+                </div>
+                <div class="col-md-4">
+                    <label for="filterTime" class="form-label">Tiempo máximo (minutos)</label>
+                    <input type="number" class="form-control" id="filterTime" placeholder="Tiempo total">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="button" class="btn btn-secondary me-2" id="btnClearFilters">
+                        <i class="bi bi-x-circle"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Recetas -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="recipesTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Categoría</th>
+                            <th>Ingredientes</th>
+                            <th>Tiempo Prep.</th>
+                            <th>Tiempo Cocción</th>
+                            <th>Porciones</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var recipe in Model)
+                            {
+                                var rowId = "instructions-" + recipe.idRecipe.ToString();
+                                <tr class="recipe-row"
+                                    data-name="@recipe.Name.ToLower()"
+                                    data-dishtype="@recipe.DishType"
+                                    data-category="@recipe.MainIngredientCategory"
+                                    data-ingredients="@string.Join(",", recipe.Ingredients).ToLower()"
+                                    data-totaltime="@(recipe.PreparationTimeMinutes + recipe.CookingTimeMinutes)"
+                                    data-target="@rowId"
+                                    style="cursor: pointer;">
+                                    <td>
+                                        <i class="bi bi-chevron-right toggle-icon me-2"></i>
+                                        <strong>@recipe.Name</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge @GetDishTypeBadgeClass(recipe.DishType)">
+                                            @recipe.DishType
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">@recipe.MainIngredientCategory</span>
+                                    </td>
+                                    <td>
+                                        @if (recipe.Ingredients != null && recipe.Ingredients.Any())
+                                        {
+                                            <span class="text-muted small">
+                                                @string.Join(", ", recipe.Ingredients.Take(3))
+                                                @if (recipe.Ingredients.Count > 3)
+                                                {
+                                                    <text>... (+@(recipe.Ingredients.Count - 3))</text>
+                                                }
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>@recipe.PreparationTimeMinutes min</td>
+                                    <td>@recipe.CookingTimeMinutes min</td>
+                                    <td>@recipe.Servings</td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@recipe.idRecipe"
+                                               class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@recipe.idRecipe"
+                                               class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete"
+                                                    data-id="@recipe.idRecipe"
+                                                    data-name="@recipe.Name"
+                                                    title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Fila de Instrucciones (oculta por defecto) -->
+                                <tr class="instructions-row" id="@rowId" style="display: none;">
+                                    <td colspan="8" class="p-0">
+                                        <div class="instructions-container bg-light border-top">
+                                            <div class="row p-3">
+                                                <div class="col-md-8">
+                                                    <h6 class="text-primary mb-2">
+                                                        <i class="bi bi-list-ol"></i> Instrucciones
+                                                    </h6>
+                                                    <div class="instructions-text">
+                                                        @if (!string.IsNullOrEmpty(recipe.Instructions))
+                                                        {
+                                                            @foreach (var line in recipe.Instructions.Split('\n'))
+                                                            {
+                                                                <p class="mb-1">@line</p>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <p class="text-muted fst-italic">Sin instrucciones</p>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <h6 class="text-primary mb-2">
+                                                        <i class="bi bi-basket"></i> Ingredientes completos
+                                                    </h6>
+                                                    <ul class="list-unstyled mb-0">
+                                                        @if (recipe.Ingredients != null && recipe.Ingredients.Any())
+                                                        {
+                                                            @foreach (var ing in recipe.Ingredients)
+                                                            {
+                                                                <li><i class="bi bi-check2 text-success"></i> @ing</li>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <li class="text-muted fst-italic">Sin ingredientes</li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr id="noRecipesRow">
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox display-4"></i>
+                                    <p class="mt-2">No hay recetas registradas</p>
+                                    <a asp-action="Create" class="btn btn-primary">Crear primera receta</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div id="noResultsMessage" class="text-center text-muted py-4" style="display: none;">
+                <i class="bi bi-search display-4"></i>
+                <p class="mt-2">No se encontraron recetas con los filtros seleccionados</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1" data-delete-url="@Url.Action("Delete", "Recipe")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar la receta <strong id="recipeNameToDelete"></strong>?</p>
+                <p class="text-muted small">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetDishTypeBadgeClass(string dishType)
+    {
+        return dishType?.ToLower() switch
+        {
+            "dulce" => "bg-pink",
+            "salado" => "bg-warning text-dark",
+            "entrada" => "bg-success",
+            "postre" => "bg-purple",
+            "bebida" => "bg-primary",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+@section Styles {
+    <style>
+        .bg-pink {
+            background-color: #e91e8c;
+        }
+
+        .bg-purple {
+            background-color: #6f42c1;
+        }
+
+        .recipe-row {
+            transition: background-color 0.2s;
+        }
+
+            .recipe-row:hover {
+                background-color: #f8f9fa;
+            }
+
+        .btn-group .btn {
+            border-radius: 0;
+        }
+
+            .btn-group .btn:first-child {
+                border-radius: 0.25rem 0 0 0.25rem;
+            }
+
+            .btn-group .btn:last-child {
+                border-radius: 0 0.25rem 0.25rem 0;
+            }
+
+        /* Estilos para fila expandible */
+        .toggle-icon {
+            transition: transform 0.2s ease;
+            color: #6c757d;
+        }
+
+        .recipe-row.expanded .toggle-icon {
+            transform: rotate(90deg);
+        }
+
+        .instructions-container {
+            border-left: 4px solid #0d6efd;
+            animation: slideDown 0.3s ease;
+        }
+
+        .instructions-text {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filtros
+            const searchName = document.getElementById('searchName');
+            const filterDishType = document.getElementById('filterDishType');
+            const filterIngredientCategory = document.getElementById('filterIngredientCategory');
+            const filterIngredient = document.getElementById('filterIngredient');
+            const filterTime = document.getElementById('filterTime');
+            const btnClearFilters = document.getElementById('btnClearFilters');
+            const rows = document.querySelectorAll('.recipe-row');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+
+            function applyFilters() {
+                const nameValue = searchName.value.toLowerCase();
+                const dishTypeValue = filterDishType.value;
+                const categoryValue = filterIngredientCategory.value;
+                const ingredientValue = filterIngredient.value.toLowerCase();
+                const timeValue = filterTime.value ? parseInt(filterTime.value) : null;
+
+                let visibleCount = 0;
+
+                rows.forEach(row => {
+                    let show = true;
+
+                    if (nameValue && !row.dataset.name.includes(nameValue)) show = false;
+                    if (dishTypeValue && row.dataset.dishtype !== dishTypeValue) show = false;
+                    if (categoryValue && row.dataset.category !== categoryValue) show = false;
+                    if (ingredientValue && !row.dataset.ingredients.includes(ingredientValue)) show = false;
+                    if (timeValue && parseInt(row.dataset.totaltime) > timeValue) show = false;
+
+                    row.style.display = show ? '' : 'none';
+
+                    // También ocultar la fila de instrucciones si la receta está oculta
+                    const instructionsRow = document.getElementById(row.dataset.target);
+                    if (instructionsRow && !show) {
+                        instructionsRow.style.display = 'none';
+                        row.classList.remove('expanded');
+                    }
+
+                    if (show) visibleCount++;
+                });
+
+                noResultsMessage.style.display = visibleCount === 0 && rows.length > 0 ? 'block' : 'none';
+            }
+
+            searchName.addEventListener('input', applyFilters);
+            filterDishType.addEventListener('change', applyFilters);
+            filterIngredientCategory.addEventListener('change', applyFilters);
+            filterIngredient.addEventListener('input', applyFilters);
+            filterTime.addEventListener('input', applyFilters);
+
+            btnClearFilters.addEventListener('click', function() {
+                searchName.value = '';
+                filterDishType.value = '';
+                filterIngredientCategory.value = '';
+                filterIngredient.value = '';
+                filterTime.value = '';
+                applyFilters();
+            });
+
+                   rows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Obtenemos el elemento en el que se hizo clic
+                const clickedElement = e.target;
+
+                // Comprobamos si el clic fue en un botón, un enlace, o el ícono de chevron/toggle
+                // Esto previene la acción de expandir/colapsar cuando se intenta interactuar con los botones de acción,
+                // Y cuando se hace clic directamente en el icono de chevron.
+                if (clickedElement.closest('a') || clickedElement.closest('button') || clickedElement.classList.contains('toggle-icon')) {
+                    return;
+                }
+
+                const targetId = this.dataset.target;
+                const instructionsRow = document.getElementById(targetId);
+
+                if (instructionsRow) {
+                    const isVisible = instructionsRow.style.display !== 'none';
+                    instructionsRow.style.display = isVisible ? 'none' : 'table-row';
+                    this.classList.toggle('expanded', !isVisible);
+                }
+            });
+        });
+
+            // Modal de eliminación
+            const deleteModalElement = document.getElementById('deleteModal');
+            const deleteModal = new bootstrap.Modal(deleteModalElement);
+            const deleteForm = document.getElementById('deleteForm');
+            const recipeNameToDelete = document.getElementById('recipeNameToDelete');
+
+            // Obtener la URL base desde el data attribute del modal
+            const baseDeleteUrl = deleteModalElement.dataset.deleteUrl;
+
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Evitar que se expanda la fila
+                    const id = this.dataset.id;
+                    const name = this.dataset.name;
+                    recipeNameToDelete.textContent = name;
+                    deleteForm.action = baseDeleteUrl + '/' + id;
+                    deleteModal.show();
+                });
+            });
+        });
+    </script>
+}
+}
+
+

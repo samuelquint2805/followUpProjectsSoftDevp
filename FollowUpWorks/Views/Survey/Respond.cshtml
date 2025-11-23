@@ -1,0 +1,147 @@
+﻿@model FollowUpWorks.DTOs.SurveyClassDTO
+@{
+    ViewData["Title"] = "Responder Encuesta";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                    <i class="bi bi-clipboard2-check text-primary display-5"></i>
+                </div>
+                <h1 class="h2 mb-2">@Model.Title</h1>
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <p class="text-muted lead">@Model.Description</p>
+                }
+                <div class="text-muted small">
+                    <i class="bi bi-list-check me-1"></i>@Model.Questions.Count preguntas
+                </div>
+            </div>
+
+            <form id="surveyResponseForm" onsubmit="return false;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="surveyId" value="@Model.Id" />
+
+                @for (int i = 0; i < Model.Questions.Count; i++)
+                {
+                    var q = Model.Questions[i];
+                    var requiredStr = q.IsRequired ? "true" : "false";
+                    <div class="card shadow-sm mb-4 respond-question-card"
+                         data-question-id="@q.Id"
+                         data-type="@q.Type"
+                         data-required="@requiredStr">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-start mb-3">
+                                <span class="badge bg-primary rounded-circle me-3 p-2">@(i + 1)</span>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">
+                                        @q.QuestionText
+                                        @if (q.IsRequired)
+                                        {
+                                            <span class="text-danger">*</span>
+                                        }
+                                    </h5>
+                                    <small class="text-muted">
+                                        @switch (q.Type)
+                                        {
+                                            case "SingleChoice":
+                                                @:Selecciona una opción
+                                                break;
+                                            case "MultipleChoice":
+                                                @:Puedes seleccionar varias
+                                                break;
+                                            case "Text":
+                                                @:Escribe tu respuesta
+                                                break;
+                                            case "Rating":
+                                                @:Califica del 1 al 5
+                                                break;
+                                        }
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="ps-5">
+                                @switch (q.Type)
+                                {
+                                    case "SingleChoice":
+                                        for (int j = 0; j < q.Options.Count; j++)
+                                        {
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="radio" name="q_@q.Id" value="@j" id="q_@(q.Id)_@j">
+                                                <label class="form-check-label" for="q_@(q.Id)_@j">@q.Options[j]</label>
+                                            </div>
+                                        }
+                                        break;
+
+                                    case "MultipleChoice":
+                                        for (int j = 0; j < q.Options.Count; j++)
+                                        {
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" name="q_@q.Id" value="@j" id="q_@(q.Id)_@j">
+                                                <label class="form-check-label" for="q_@(q.Id)_@j">@q.Options[j]</label>
+                                            </div>
+                                        }
+                                        break;
+
+                                    case "Text":
+                                        <textarea class="form-control" name="q_@q.Id" rows="3" placeholder="Tu respuesta..."></textarea>
+                                        break;
+
+                                    case "Rating":
+                                        <div class="rating-container">
+                                            @for (int j = 1; j <= 5; j++)
+                                            {
+                                                <label class="rating-label">
+                                                    <input type="radio" name="q_@q.Id" value="@j">
+                                                    <div class="rating-btn">
+                                                        <i class="bi bi-star"></i>
+                                                        <span>@j</span>
+                                                    </div>
+                                                </label>
+                                            }
+                                        </div>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary btn-lg py-3" id="submitBtn" onclick="SurveyRespond.submit()">
+                        <i class="bi bi-send me-2"></i>Enviar Respuestas
+                    </button>
+                    <a asp-action="Index" class="btn btn-link text-muted">Cancelar</a>
+                </div>
+            </form>
+
+            <div class="progress mt-4" style="height: 8px;">
+                <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+            </div>
+            <small class="text-muted d-block text-center mt-2">
+                <span id="answeredCount">0</span> de @Model.Questions.Count respondidas
+            </small>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/SurveyStyles.css" />
+}
+
+@section Scripts {
+    <script src="~/js/SurveyScript.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            SurveyRespond.init({
+                surveyId: '@Model.Id',
+                totalQuestions: @Model.Questions.Count,
+                submitUrl: '@Url.Action("SubmitResponse")',
+                redirectUrl: '@Url.Action("ThankYou")'
+            });
+        });
+    </script>
+}

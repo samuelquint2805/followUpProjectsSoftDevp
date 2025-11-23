@@ -1,0 +1,73 @@
+﻿/* Notes Styles */
+
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: visible !important; /* IMPORTANTE: permite que el dropdown se muestre */
+}
+
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+    }
+
+.note-preview {
+    min-height: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text-truncate {
+    max-width: 180px;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+#previewContent {
+    min-height: 200px;
+    white-space: pre-wrap;
+}
+
+.card {
+    border: none;
+    overflow: visible !important; /* IMPORTANTE */
+}
+
+/* Fix para el dropdown */
+.card-header {
+    overflow: visible !important;
+    position: relative;
+}
+
+    .card-header .dropdown {
+        position: static; /* o relative */
+    }
+
+    .card-header .dropdown-menu {
+        z-index: 1050 !important;
+        position: absolute !important;
+    }
+
+/* Asegurar que el dropdown se muestre sobre las cards */
+.note-item {
+    position: relative;
+}
+
+    .note-item .dropdown-menu.show {
+        z-index: 1060 !important;
+    }
+
+textarea.form-control {
+    resize: vertical;
+}
+
+.alert-light {
+    background-color: #f8f9fa;
+}
+
+/* Fix adicional para el hover que puede interferir */
+.hover-card:hover .dropdown-menu {
+    transform: none !important;
+}

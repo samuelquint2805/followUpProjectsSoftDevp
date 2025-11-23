@@ -1,0 +1,427 @@
+﻿@model List<FollowUpWorks.DTOs.TaskListClassDTO>
+@{
+    ViewData["Title"] = "Lista de Tareas";
+    var pending = Model.Count(t => t.IsCompleted != true);
+    var completed = Model.Count(t => t.IsCompleted == true);
+}
+<div class="mt-5 pt-4"></div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="display-6 fw-bold">
+                    <i class="bi bi-check2-square text-primary me-2"></i>Lista de Tareas
+                </h1>
+                <p class="text-muted">Organiza tu día de manera simple</p>
+            </div>
+
+            <!-- Card de agregar tarea -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-5">
+                            <input type="text" id="taskTitle" class="form-control" placeholder="Nueva tarea..." maxlength="100">
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" id="taskDescription" class="form-control" placeholder="Descripción (opcional)" maxlength="200">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" id="btnAddTask" class="btn btn-primary w-100">
+                                <i class="bi bi-plus-lg"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="row mb-3">
+                <div class="col-6">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-warning text-dark me-2" id="pendingCount">@pending</span>
+                        <span class="text-muted small">Pendientes</span>
+                    </div>
+                </div>
+                <div class="col-6 text-end">
+                    <div class="d-flex align-items-center justify-content-end">
+                        <span class="text-muted small me-2">Completadas</span>
+                        <span class="badge bg-success" id="completedCount">@completed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="btn-group mb-3 w-100" role="group">
+                <button type="button" class="btn btn-outline-secondary filter-btn active" data-filter="all">
+                    Todas <span class="badge bg-secondary ms-1" id="allCount">@Model.Count</span>
+                </button>
+                <button type="button" class="btn btn-outline-secondary filter-btn" data-filter="pending">
+                    Pendientes
+                </button>
+                <button type="button" class="btn btn-outline-secondary filter-btn" data-filter="completed">
+                    Completadas
+                </button>
+            </div>
+
+            <!-- Lista de tareas -->
+            <div class="card shadow-sm">
+                <ul class="list-group list-group-flush" id="taskList">
+                    @if (!Model.Any())
+                    {
+                        <li class="list-group-item text-center py-5 empty-state">
+                            <i class="bi bi-inbox text-muted display-4"></i>
+                            <p class="text-muted mt-2 mb-0">No hay tareas. ¡Agrega una!</p>
+                        </li>
+                    }
+                    else
+                    {
+                        @foreach (var task in Model)
+                        {
+                            var completedClass = task.IsCompleted == true ? "completed" : "";
+                            var checkedAttr = task.IsCompleted == true ? "checked" : "";
+                            <li class="list-group-item task-item @completedClass" data-id="@task.idTask" data-completed="@task.IsCompleted.ToString().ToLower()">
+                                <div class="d-flex align-items-center">
+                                    <div class="form-check me-3">
+                                        <input type="checkbox" class="form-check-input task-checkbox border border-dark" @checkedAttr>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="task-title fw-semibold">@task.Title</div>
+                                        @if (!string.IsNullOrEmpty(task.Description))
+                                        {
+                                            <small class="task-description text-muted">@task.Description</small>
+                                        }
+                                        <small class="d-block text-muted mt-1">
+                                            <i class="bi bi-clock me-1"></i>@task.Date.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger btn-delete-task ms-2">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+
+            <!-- Acciones -->
+            <div class="d-flex justify-content-between mt-3">
+                <small class="text-muted" id="taskSummary">
+                    @pending tarea(s) pendiente(s)
+                </small>
+                <button type="button" id="btnClearCompleted" class="btn btn-sm btn-outline-danger @(completed == 0 ? "d-none" : "")">
+                    <i class="bi bi-trash me-1"></i>Limpiar completadas
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .task-item {
+            transition: all 0.3s ease;
+        }
+
+            .task-item:hover {
+                background-color: #f8f9fa;
+            }
+
+            .task-item.completed .task-title {
+                text-decoration: line-through;
+                color: #6c757d;
+            }
+
+            .task-item.completed .task-description {
+                text-decoration: line-through;
+            }
+
+        .task-checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+        }
+
+        .task-item.filtered-out {
+            display: none !important;
+        }
+
+        .btn-delete-task {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .task-item:hover .btn-delete-task {
+            opacity: 1;
+        }
+
+        #taskTitle:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var taskTitleInput = document.getElementById('taskTitle');
+            var taskDescInput = document.getElementById('taskDescription');
+            var btnAddTask = document.getElementById('btnAddTask');
+            var taskList = document.getElementById('taskList');
+            var btnClearCompleted = document.getElementById('btnClearCompleted');
+            var filterBtns = document.querySelectorAll('.filter-btn');
+            var currentFilter = 'all';
+
+            // Agregar tarea
+            btnAddTask.addEventListener('click', addTask);
+            taskTitleInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addTask();
+            });
+
+            function addTask() {
+                var title = taskTitleInput.value.trim();
+                var description = taskDescInput.value.trim();
+
+                if (!title) {
+                    taskTitleInput.focus();
+                    return;
+                }
+
+                btnAddTask.disabled = true;
+
+                fetch('@Url.Action("Create", "TaskList")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: title, description: description })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        // Remover empty state si existe
+                        var emptyState = taskList.querySelector('.empty-state');
+                        if (emptyState) emptyState.remove();
+
+                        // Agregar tarea al inicio
+                        var li = createTaskElement(data.task);
+                        taskList.insertBefore(li, taskList.firstChild);
+
+                        // Limpiar inputs
+                        taskTitleInput.value = '';
+                        taskDescInput.value = '';
+                        taskTitleInput.focus();
+
+                        updateCounts();
+                        applyFilter();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(function(err) {
+                    console.error(err);
+                    alert('Error al agregar tarea');
+                })
+                .finally(function() {
+                    btnAddTask.disabled = false;
+                });
+            }
+
+            function createTaskElement(task) {
+                var li = document.createElement('li');
+                li.className = 'list-group-item task-item';
+                li.setAttribute('data-id', task.idTask);
+                li.setAttribute('data-completed', 'false');
+
+                var date = new Date(task.date);
+                var dateStr = date.toLocaleDateString('es-ES') + ' ' + date.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'});
+
+                var descHtml = task.description ? '<small class="task-description text-muted">' + escapeHtml(task.description) + '</small>' : '';
+
+                li.innerHTML = '<div class="d-flex align-items-center">' +
+                    '<div class="form-check me-3">' +
+                    '<input type="checkbox" class="form-check-input task-checkbox">' +
+                    '</div>' +
+                    '<div class="flex-grow-1">' +
+                    '<div class="task-title fw-semibold">' + escapeHtml(task.title) + '</div>' +
+                    descHtml +
+                    '<small class="d-block text-muted mt-1"><i class="bi bi-clock me-1"></i>' + dateStr + '</small>' +
+                    '</div>' +
+                    '<button type="button" class="btn btn-sm btn-outline-danger btn-delete-task ms-2">' +
+                    '<i class="bi bi-trash"></i></button>' +
+                    '</div>';
+
+                bindTaskEvents(li);
+                return li;
+            }
+
+            // Bind eventos delegados
+            taskList.addEventListener('change', function(e) {
+                if (e.target.classList.contains('task-checkbox')) {
+                    var li = e.target.closest('.task-item');
+                    toggleTask(li);
+                }
+            });
+
+            taskList.addEventListener('click', function(e) {
+                if (e.target.closest('.btn-delete-task')) {
+                    var li = e.target.closest('.task-item');
+                    deleteTask(li);
+                }
+            });
+
+            function bindTaskEvents(li) {
+                // Ya manejado por delegación
+            }
+
+            function toggleTask(li) {
+                var id = li.getAttribute('data-id');
+
+                fetch('@Url.Action("Toggle", "TaskList")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(id)
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        li.setAttribute('data-completed', data.isCompleted.toString());
+                        if (data.isCompleted) {
+                            li.classList.add('completed');
+                        } else {
+                            li.classList.remove('completed');
+                        }
+                        updateCounts();
+                        applyFilter();
+                    }
+                })
+                .catch(function(err) {
+                    console.error(err);
+                });
+            }
+
+            function deleteTask(li) {
+                if (!confirm('¿Eliminar esta tarea?')) return;
+
+                var id = li.getAttribute('data-id');
+
+                fetch('@Url.Action("Delete", "TaskList")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(id)
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        li.remove();
+                        updateCounts();
+                        checkEmptyState();
+                    }
+                })
+                .catch(function(err) {
+                    console.error(err);
+                });
+            }
+
+            // Limpiar completadas
+            btnClearCompleted.addEventListener('click', function() {
+                if (!confirm('¿Eliminar todas las tareas completadas?')) return;
+
+                fetch('@Url.Action("ClearCompleted", "TaskList")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        document.querySelectorAll('.task-item.completed').forEach(function(li) {
+                            li.remove();
+                        });
+                        updateCounts();
+                        checkEmptyState();
+                    }
+                })
+                .catch(function(err) {
+                    console.error(err);
+                });
+            });
+
+            // Filtros
+            filterBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    filterBtns.forEach(function(b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    currentFilter = this.getAttribute('data-filter');
+                    applyFilter();
+                });
+            });
+
+            function applyFilter() {
+                document.querySelectorAll('.task-item').forEach(function(li) {
+                    var isCompleted = li.getAttribute('data-completed') === 'true';
+                    var show = false;
+
+                    if (currentFilter === 'all') show = true;
+                    else if (currentFilter === 'pending') show = !isCompleted;
+                    else if (currentFilter === 'completed') show = isCompleted;
+
+                    if (show) {
+                        li.classList.remove('filtered-out');
+                    } else {
+                        li.classList.add('filtered-out');
+                    }
+                });
+            }
+
+            function updateCounts() {
+                var tasks = document.querySelectorAll('.task-item');
+                var pending = 0;
+                var completed = 0;
+
+                tasks.forEach(function(li) {
+                    if (li.getAttribute('data-completed') === 'true') {
+                        completed++;
+                    } else {
+                        pending++;
+                    }
+                });
+
+                document.getElementById('pendingCount').textContent = pending;
+                document.getElementById('completedCount').textContent = completed;
+                document.getElementById('allCount').textContent = tasks.length;
+                document.getElementById('taskSummary').textContent = pending + ' tarea(s) pendiente(s)';
+
+                if (completed > 0) {
+                    btnClearCompleted.classList.remove('d-none');
+                } else {
+                    btnClearCompleted.classList.add('d-none');
+                }
+            }
+
+            function checkEmptyState() {
+                var tasks = document.querySelectorAll('.task-item');
+                if (tasks.length === 0) {
+                    var emptyLi = document.createElement('li');
+                    emptyLi.className = 'list-group-item text-center py-5 empty-state';
+                    emptyLi.innerHTML = '<i class="bi bi-inbox text-muted display-4"></i>' +
+                        '<p class="text-muted mt-2 mb-0">No hay tareas. ¡Agrega una!</p>';
+                    taskList.appendChild(emptyLi);
+                }
+            }
+
+            function escapeHtml(text) {
+                var div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        });
+    </script>
+}

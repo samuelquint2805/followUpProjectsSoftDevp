@@ -1,0 +1,215 @@
+﻿@model FollowUpWorks.DTOs.TipClassDTO
+@{
+    ViewData["Title"] = "Calculadora de Propinas";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <!-- Card Principal -->
+            <div class="card shadow-lg border-0">
+                <!-- Header -->
+                <div class="card-header bg-success text-white text-center py-4">
+                    <i class="bi bi-cash-coin display-4"></i>
+                    <h3 class="mb-0 mt-2">Calculadora de Propinas</h3>
+                    <small class="opacity-75">Calcula rápidamente cuánto dejar</small>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-4">
+                    <!-- Monto de la cuenta -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-receipt me-1"></i>Monto de la Cuenta
+                        </label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light">$</span>
+                            <input type="number"
+                                   id="tipAmount"
+                                   class="form-control"
+                                   placeholder="0.00"
+                                   min="0"
+                                   step="0.01"
+                                   value="">
+                        </div>
+                    </div>
+
+                    <!-- Porcentaje de propina -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-percent me-1"></i>Porcentaje de Propina
+                        </label>
+                        <div class="d-flex gap-2 mb-3">
+                            <button type="button" class="btn btn-outline-success flex-fill btn-percentage" data-value="10">10%</button>
+                            <button type="button" class="btn btn-outline-success flex-fill btn-percentage" data-value="15">15%</button>
+                            <button type="button" class="btn btn-outline-success flex-fill btn-percentage" data-value="20">20%</button>
+                            <button type="button" class="btn btn-outline-success flex-fill btn-percentage" data-value="25">25%</button>
+                        </div>
+                        <div class="input-group">
+                            <input type="number"
+                                   id="tipPercentage"
+                                   class="form-control"
+                                   placeholder="Otro %"
+                                   min="1"
+                                   max="100"
+                                   value="">
+                            <span class="input-group-text bg-light">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-grid gap-2 mb-4">
+                        <button type="button" id="btnCalculate" class="btn btn-success btn-lg">
+                            <i class="bi bi-calculator me-2"></i>Calcular Propina
+                        </button>
+                        <button type="button" id="btnReset" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-counterclockwise me-2"></i>Limpiar
+                        </button>
+                    </div>
+
+                    <!-- Resultados -->
+                    <div id="resultsSection" class="d-none">
+                        <hr>
+                        <div class="bg-light rounded p-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal:</span>
+                                <span id="subtotalResult" class="fw-semibold">$0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Propina (<span id="percentageLabel">0</span>%):</span>
+                                <span id="tipResult" class="fw-semibold text-success">$0.00</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <span class="fs-5 fw-bold">Total a Pagar:</span>
+                                <span id="totalResult" class="fs-4 fw-bold text-success">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer bg-white text-center py-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        La propina sugerida es entre 15% y 20%
+                    </small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .btn-percentage.active {
+            background-color: #198754 !important;
+            color: white !important;
+        }
+
+        .card {
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            border-bottom: none;
+        }
+
+        #tipAmount:focus, #tipPercentage:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var tipAmountInput = document.getElementById('tipAmount');
+            var tipPercentageInput = document.getElementById('tipPercentage');
+            var btnCalculate = document.getElementById('btnCalculate');
+            var btnReset = document.getElementById('btnReset');
+            var resultsSection = document.getElementById('resultsSection');
+            var percentageBtns = document.querySelectorAll('.btn-percentage');
+
+            // Botones de porcentaje rápido
+            percentageBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    // Remover active de todos
+                    percentageBtns.forEach(function(b) { b.classList.remove('active'); });
+                    // Agregar active al clickeado
+                    this.classList.add('active');
+                    // Setear valor
+                    tipPercentageInput.value = this.getAttribute('data-value');
+                });
+            });
+
+            // Input de porcentaje manual - quitar active de botones
+            tipPercentageInput.addEventListener('input', function() {
+                percentageBtns.forEach(function(b) { b.classList.remove('active'); });
+            });
+
+            // Calcular
+            btnCalculate.addEventListener('click', function() {
+                var amount = parseFloat(tipAmountInput.value) || 0;
+                var percentage = parseInt(tipPercentageInput.value) || 0;
+
+                if (amount <= 0) {
+                    alert('Por favor ingresa un monto válido');
+                    tipAmountInput.focus();
+                    return;
+                }
+
+                if (percentage <= 0 || percentage > 100) {
+                    alert('Por favor ingresa un porcentaje válido (1-100)');
+                    tipPercentageInput.focus();
+                    return;
+                }
+
+                // Calcular localmente (más rápido)
+                var tipResult = amount * percentage / 100;
+                var total = amount + tipResult;
+
+                // Mostrar resultados
+                document.getElementById('subtotalResult').textContent = '$' + amount.toFixed(2);
+                document.getElementById('percentageLabel').textContent = percentage;
+                document.getElementById('tipResult').textContent = '$' + tipResult.toFixed(2);
+                document.getElementById('totalResult').textContent = '$' + total.toFixed(2);
+
+                resultsSection.classList.remove('d-none');
+
+                // Scroll a resultados
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+
+            // Reset
+            btnReset.addEventListener('click', function() {
+                tipAmountInput.value = '';
+                tipPercentageInput.value = '';
+                percentageBtns.forEach(function(b) { b.classList.remove('active'); });
+                resultsSection.classList.add('d-none');
+                tipAmountInput.focus();
+            });
+
+            // Enter para calcular
+            tipAmountInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    if (tipPercentageInput.value) {
+                        btnCalculate.click();
+                    } else {
+                        tipPercentageInput.focus();
+                    }
+                }
+            });
+
+            tipPercentageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    btnCalculate.click();
+                }
+            });
+        });
+    </script>
+}

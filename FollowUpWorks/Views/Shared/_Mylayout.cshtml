@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Index - Craftivo Bootstrap Template</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+
+    <!-- Favicons -->
+    <link href="~/assets/img/favicon.png" rel="icon">
+    <link href="~/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Mulish:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="~/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="~/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="~/stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="~/css/recipestyles.css" rel="stylesheet" />
+    <link href="~/css/timekeeperstyles.css" rel="stylesheet" />
+    <link href="~/css/reservationstyle.css" rel="stylesheet" />
+    
+    <!-- Main CSS File -->
+    <link href="~/assets/css/main.css" rel="stylesheet">
+
+    <!-- =======================================================
+    * Template Name: Craftivo
+    * Template URL: https://bootstrapmade.com/craftivo-bootstrap-portfolio-template/
+    * Updated: Oct 04 2025 with Bootstrap v5.3.8
+    * Author: BootstrapMade.com
+    * License: https://bootstrapmade.com/license/
+    ======================================================== -->
+</head>
+
+<body class="index-page">
+
+    <header id="header" class="header d-flex align-items-center fixed-top">
+        <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+            <a href="index.html" class="logo d-flex align-items-center me-auto">
+                <!-- Uncomment the line below if you also wish to use an image logo -->
+                <!-- <img src="assets/img/logo.webp" alt=""> -->
+                <h1 class="sitename">Craftivo</h1>
+            </a>
+
+            <nav id="navmenu" class="navmenu">
+                <ul>
+                    <li><a asp-controller="EvenList" asp-action="Index">Calendario de Eventos</a></li>
+                    <li><a asp-controller ="Expenses" asp-action="Index">Gastos</a></li>
+                    <li><a asp-controller="MemoryGame" asp-action="Index">Juego de patrones</a></li>
+                    <li><a asp-controller="Notes" asp-action="Index">Notas</a></li>
+                    <li><a asp-controller="PasswordHash" asp-action="Index">Contraseñas</a></li>
+                    <li class="dropdown">
+                        <a href="#"><span>ejecicios</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                        <ul>
+                            <li><a asp-controller="Recipe" asp-action="Index">Recetario</a></li>
+                            <li><a asp-controller="TimeKeeper" asp-action="Index">Cronometro</a></li>
+                            <li><a asp-controller="Reservation" asp-action="Index">Reservaciones</a></li>
+                            <li><a asp-controller="Survey" asp-action="Index">Encuestas</a></li>
+                            <li><a asp-controller="Tips" asp-action="Index">Propinas</a></li>
+                        </ul>
+                    </li>
+                    <li><a asp-controller="TaskList" asp-action="Index">Tareas</a></li>
+                </ul>
+                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+            </nav>
+
+            <a class="btn-getstarted" href="#about">Get Started</a>
+
+        </div>
+    </header>
+
+    <main class="main">
+@RenderBody()
+       
+
+    </main>
+    <div class="mt-5 pt-4"></div>
+    <!-- Scroll Top -->
+    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Preloader -->
+    <div id="preloader"></div>
+
+    <!-- Vendor JS Files -->
+    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/vendor/php-email-form/validate.js"></script>
+    <script src="~/assets/vendor/aos/aos.js"></script>
+    <script src="~/assets/vendor/typed.js/typed.umd.js"></script>
+    <script src="~/assets/vendor/waypoints/noframework.waypoints.js"></script>
+    <script src="~/assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="~/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+    <script src="~/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="~/assets/vendor/swiper/swiper-bundle.min.js"></script>
+   
+    <script src="~/js/passwordhashscript.js"></script>
+    <script src="~/js/recipescript.js"></script>
+    <script src="~/js/timekeeperscript.js"></script>
+    <script src="~/js/ReservationScript.js"></script>
+    
+    <!-- Main JS File -->
+    <script src="~/assets/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+
+    @RenderSection("Scripts", required: false)
+    @RenderSection("Styles", required: false)
+</body>
+
+</html>

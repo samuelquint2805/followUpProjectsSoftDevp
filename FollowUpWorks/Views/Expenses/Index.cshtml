@@ -1,0 +1,286 @@
+﻿@model FollowUpWorks.Models.ExpensesClassSection.ExpensesIndexViewModel
+@{
+    ViewData["Title"] = "Gestor de Gastos";
+}
+<div class="mt-5 pt-4"></div>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-wallet2"></i> Gestor de Gastos
+            </h1>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (ViewBag.Errors != null)
+    {
+        <div class="alert alert-danger">
+            @foreach (var error in ViewBag.Errors)
+            {
+                <p>@error</p>
+            }
+        </div>
+    }
+
+
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total del Período</h6>
+                    
+                    <h3 class="text-primary">$@Model.TotalExpenses.ToString("N2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Cantidad de Gastos</h6>
+                    
+                    <h3 class="text-info">@Model.Expenses.Count</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Promedio por Gasto</h6>
+                    <h3 class="text-warning">
+                        $@(Model.Expenses.Any() ? (Model.TotalExpenses / Model.Expenses.Count).ToString("N2") : "0.00")
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Categorías Únicas</h6>
+                    <h3 class="text-success">@Model.ExpensesByCategory.Count</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    
+                    <form method="get" asp-action="Index" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Categoría</label>
+                            <select name="category" class="form-select">
+                                <option value="Todas" selected="@(Model.SelectedCategory == "Todas")">Todas las categorías</option>
+                                @foreach (var cat in Model.Categories.OrderBy(c => c))
+                                {
+                                    <option value="@cat" selected="@(Model.SelectedCategory == cat)">@cat</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Mes</label>
+                            <select name="month" class="form-select">
+                                @for (int i = 1; i <= 12; i++)
+                                {
+                                    <option value="@i" selected="@(Model.SelectedMonth == i)">
+                                        @(new DateTime(2000, i, 1).ToString("MMMM"))
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Año</label>
+                            <select name="year" class="form-select">
+                                @for (int i = DateTime.Now.Year; i >= DateTime.Now.Year - 5; i--)
+                                {
+                                    <option value="@i" selected="@(Model.SelectedYear == i)">@i</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-funnel"></i> Filtrar
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <a asp-action="Create" class="btn btn-success w-100">
+                                <i class="bi bi-plus-circle"></i> Nuevo Gasto
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Lista de Gastos</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Expenses != null && Model.Expenses.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Descripción</th>
+                                        <th>Categoría</th>
+                                        <th class="text-end">Monto</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    @foreach (var item in Model.Expenses.OrderByDescending(e => e.Date))
+                                    {
+                                        <tr>
+                                            <td>@item.Date.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                <strong>@item.Description</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@item.Category</span>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong class="text-danger">$@item.Amount.ToString("N2")</strong>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    
+                                                   
+                                                    <a asp-action="Edit" asp-route-id="@item.IdExpense"
+                                                       class="btn btn-outline-warning" title="Editar">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <form asp-action="Delete" asp-route-id="@item.IdExpense" method="post"
+                                                          style="display:inline;"
+                                                          onsubmit="return confirm('¿Está seguro que desea eliminar este gasto?');">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-outline-danger" title="Eliminar">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info m-3" role="alert">
+                            <i class="bi bi-info-circle"></i> No hay gastos registrados para el período seleccionado.
+                            <a asp-action="Create" class="alert-link">Registrar el primero</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Gastos por Categoría</h5>
+                </div>
+                <div class="card-body">
+                    
+                    @if (Model.ExpensesByCategory.Any())
+                    {
+                        @foreach (var category in Model.ExpensesByCategory)
+                        {
+                            var percentage = Model.TotalExpenses > 0 ? (category.Total / Model.TotalExpenses * 100) : 0;
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span>
+                                        <strong>
+                                            <a asp-action="Index" asp-route-category="@category.Category"
+                                               asp-route-month="@Model.SelectedMonth" asp-route-year="@Model.SelectedYear"
+                                               style="text-decoration:none;">@category.Category</a>
+                                        </strong>
+                                        <small class="text-muted">(@category.Count gastos)</small>
+                                    </span>
+                                    <span class="text-danger fw-bold">$@category.Total.ToString("N2")</span>
+                                </div>
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar @GetProgressBarColor(category.Category)"
+                                         role="progressbar"
+                                         style="width: @percentage.ToString("F1")%"
+                                         aria-valuenow="@percentage"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        @percentage.ToString("F1")%
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">No hay datos para mostrar</p>
+                    }
+                </div>
+            </div>
+
+            @if (Model.Expenses.Any())
+            {
+                var maxExpense = Model.Expenses.OrderByDescending(e => e.Amount).First();
+                var minExpense = Model.Expenses.OrderBy(e => e.Amount).First();
+
+                <div class="card mt-3">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Extremos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6 class="text-muted">Gasto Máximo</h6>
+                            <p class="mb-0">
+                                <strong>@maxExpense.Description</strong><br />
+                                <span class="text-danger fs-5">$@maxExpense.Amount.ToString("N2")</span>
+                            </p>
+                        </div>
+                        <hr />
+                        <div>
+                            <h6 class="text-muted">Gasto Mínimo</h6>
+                            <p class="mb-0">
+                                <strong>@minExpense.Description</strong><br />
+                                <span class="text-success fs-5">$@minExpense.Amount.ToString("N2")</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetProgressBarColor(string category)
+    {
+        var colors = new Dictionary<string, string>
+        {
+            { "Alimentos", "bg-success" },
+            { "Transporte", "bg-primary" },
+            { "Servicios", "bg-warning" },
+            { "Entretenimiento", "bg-info" },
+            { "Salud", "bg-danger" },
+            { "Educación", "bg-secondary" },
+            { "Otros", "bg-dark" }
+        };
+
+        // Usa GetValueOrDefault para manejar categorías no definidas, usando "bg-primary" como default
+        return colors.GetValueOrDefault(category, "bg-secondary");
+    }
+}

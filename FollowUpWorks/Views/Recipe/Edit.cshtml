@@ -1,0 +1,215 @@
+﻿@model FollowUpWorks.DTOs.RecipeClassDTO
+
+@{
+    ViewData["Title"] = "Editar Receta";
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Recetas</a></li>
+            <li class="breadcrumb-item active">Editar: @Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning">
+                    <h4 class="mb-0"><i class="bi bi-pencil-square"></i> Editar Receta</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" id="recipeForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="idRecipe" />
+
+                        <!-- Información Básica -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 text-primary">
+                                <i class="bi bi-info-circle"></i> Información Básica
+                            </h5>
+
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label">Nombre de la Receta <span class="text-danger">*</span></label>
+                                <input asp-for="Name" class="form-control" placeholder="Ej: Pasta Carbonara" required />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="DishType" class="form-label">Tipo de Plato <span class="text-danger">*</span></label>
+                                    <select asp-for="DishType" class="form-select" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="Dulce">Dulce</option>
+                                        <option value="Salado">Salado</option>
+                                        <option value="Entrada">Entrada</option>
+                                        <option value="Postre">Postre</option>
+                                        <option value="Bebida">Bebida</option>
+                                    </select>
+                                    <span asp-validation-for="DishType" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="MainIngredientCategory" class="form-label">Categoría Principal <span class="text-danger">*</span></label>
+                                    <select asp-for="MainIngredientCategory" class="form-select" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="Carne">Carne</option>
+                                        <option value="Pollo">Pollo</option>
+                                        <option value="Pescado">Pescado</option>
+                                        <option value="Granos">Granos</option>
+                                        <option value="Vegetales">Vegetales</option>
+                                        <option value="Frutas">Frutas</option>
+                                        <option value="Lácteos">Lácteos</option>
+                                    </select>
+                                    <span asp-validation-for="MainIngredientCategory" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ingredientes -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 text-primary">
+                                <i class="bi bi-basket"></i> Ingredientes
+                            </h5>
+
+                            <div id="ingredientsContainer">
+                                @if (Model.Ingredients != null && Model.Ingredients.Any())
+                                {
+                                    @for (int i = 0; i < Model.Ingredients.Count; i++)
+                                    {
+                                        <div class="input-group mb-2 ingredient-row">
+                                            <input type="text" name="Ingredients" class="form-control"
+                                                   value="@Model.Ingredients[i]" placeholder="Ej: 200g de pasta" />
+                                            <button type="button" class="btn btn-outline-danger btn-remove-ingredient"
+                                                    @(Model.Ingredients.Count == 1 ? "disabled" : "")>
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="input-group mb-2 ingredient-row">
+                                        <input type="text" name="Ingredients" class="form-control" placeholder="Ej: 200g de pasta" />
+                                        <button type="button" class="btn btn-outline-danger btn-remove-ingredient" disabled>
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                            <button type="button" class="btn btn-outline-success btn-sm" id="btnAddIngredient">
+                                <i class="bi bi-plus"></i> Agregar Ingrediente
+                            </button>
+                        </div>
+
+                        <!-- Instrucciones -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 text-primary">
+                                <i class="bi bi-list-ol"></i> Instrucciones
+                            </h5>
+
+                            <div class="mb-3">
+                                <label asp-for="Instructions" class="form-label">Pasos de Preparación <span class="text-danger">*</span></label>
+                                <textarea asp-for="Instructions" class="form-control" rows="6"
+                                          placeholder="Describe paso a paso cómo preparar la receta..." required></textarea>
+                                <span asp-validation-for="Instructions" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tiempos y Porciones -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 text-primary">
+                                <i class="bi bi-clock"></i> Tiempos y Porciones
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="PreparationTimeMinutes" class="form-label">
+                                        <i class="bi bi-hourglass-split"></i> Tiempo de Preparación
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="PreparationTimeMinutes" type="number" class="form-control" min="0" />
+                                        <span class="input-group-text">min</span>
+                                    </div>
+                                    <span asp-validation-for="PreparationTimeMinutes" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="CookingTimeMinutes" class="form-label">
+                                        <i class="bi bi-fire"></i> Tiempo de Cocción
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="CookingTimeMinutes" type="number" class="form-control" min="0" />
+                                        <span class="input-group-text">min</span>
+                                    </div>
+                                    <span asp-validation-for="CookingTimeMinutes" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="Servings" class="form-label">
+                                        <i class="bi bi-people"></i> Porciones
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="Servings" type="number" class="form-control" min="1" />
+                                        <span class="input-group-text">personas</span>
+                                    </div>
+                                    <span asp-validation-for="Servings" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mt-2">
+                                <i class="bi bi-stopwatch"></i> Tiempo total estimado: <strong id="totalTime">@(Model.PreparationTimeMinutes + Model.CookingTimeMinutes)</strong> minutos
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                            <div>
+                                <button type="button" class="btn btn-outline-danger me-2" id="btnDelete">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-check-circle"></i> Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar la receta <strong>@Model.Name</strong>?</p>
+                <p class="text-muted small">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form asp-action="Delete" asp-route-id="@Model.idRecipe" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section styles {
+    <link href="~/css/recipestyles.css" rel="stylesheet" />
+}
+
+@section scripts {
+    <script src="~/js/recipescript.js"></script>
+}
+

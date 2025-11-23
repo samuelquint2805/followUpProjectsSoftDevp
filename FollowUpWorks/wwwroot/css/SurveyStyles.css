@@ -1,0 +1,264 @@
+﻿/* ========== SURVEY STYLES ========== */
+
+/* Index Page */
+.survey-icon-box {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Create/Edit Page */
+.question-card {
+    border-left: 4px solid #0d6efd;
+    transition: all 0.3s;
+}
+
+    .question-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+/* Respond Page */
+.respond-question-card {
+    transition: all 0.3s;
+    border-left: 4px solid transparent;
+}
+
+    .respond-question-card.answered {
+        border-left-color: #198754;
+    }
+
+    .respond-question-card.error {
+        border-left-color: #dc3545;
+        animation: shake 0.5s;
+    }
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+/* Rating Buttons */
+.rating-container {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.rating-label .rating-btn {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    background: transparent;
+    color: #ffc107;
+}
+
+    .rating-label .rating-btn:hover,
+    .rating-label input:checked + .rating-btn {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+.rating-label input {
+    display: none;
+}
+
+/* Dashboard */
+.stat-card {
+    border: none;
+    border-radius: 12px;
+}
+
+    .stat-card.primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .stat-card.success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .stat-card.info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+/* Thank You Page */
+.success-checkmark {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+}
+
+.check-icon {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    border-radius: 50%;
+    box-sizing: content-box;
+    border: 4px solid #198754;
+}
+
+    .check-icon::before,
+    .check-icon::after {
+        content: '';
+        height: 100px;
+        position: absolute;
+        background: #fff;
+        transform: rotate(-45deg);
+    }
+
+    .check-icon::before {
+        top: 3px;
+        left: -2px;
+        width: 30px;
+        transform-origin: 100% 50%;
+        border-radius: 100px 0 0 100px;
+    }
+
+    .check-icon::after {
+        top: 0;
+        left: 30px;
+        width: 60px;
+        transform-origin: 0 50%;
+        border-radius: 0 100px 100px 0;
+        animation: rotate-circle 4.25s ease-in;
+    }
+
+.icon-line {
+    height: 5px;
+    background-color: #198754;
+    display: block;
+    border-radius: 2px;
+    position: absolute;
+    z-index: 10;
+}
+
+    .icon-line.line-tip {
+        top: 56px;
+        left: 22px;
+        width: 30px;
+        transform: rotate(45deg);
+        animation: icon-line-tip 0.75s;
+    }
+
+    .icon-line.line-long {
+        top: 48px;
+        right: 18px;
+        width: 55px;
+        transform: rotate(-45deg);
+        animation: icon-line-long 0.75s;
+    }
+
+.icon-circle {
+    top: -4px;
+    left: -4px;
+    z-index: 10;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    position: absolute;
+    box-sizing: content-box;
+    border: 4px solid rgba(25, 135, 84, 0.5);
+}
+
+.icon-fix {
+    top: 8px;
+    width: 5px;
+    left: 34px;
+    z-index: 1;
+    height: 95px;
+    position: absolute;
+    transform: rotate(-45deg);
+    background-color: #fff;
+}
+
+@keyframes rotate-circle {
+    0% {
+        transform: rotate(-45deg);
+    }
+
+    5% {
+        transform: rotate(-45deg);
+    }
+
+    12% {
+        transform: rotate(-405deg);
+    }
+
+    100% {
+        transform: rotate(-405deg);
+    }
+}
+
+@keyframes icon-line-tip {
+    0% {
+        width: 0;
+        left: 1px;
+        top: 19px;
+    }
+
+    54% {
+        width: 0;
+        left: 1px;
+        top: 19px;
+    }
+
+    70% {
+        width: 50px;
+        left: -8px;
+        top: 47px;
+    }
+
+    84% {
+        width: 17px;
+        left: 21px;
+        top: 54px;
+    }
+
+    100% {
+        width: 30px;
+        left: 22px;
+        top: 56px;
+    }
+}
+
+@keyframes icon-line-long {
+    0% {
+        width: 0;
+        right: 56px;
+        top: 54px;
+    }
+
+    65% {
+        width: 0;
+        right: 56px;
+        top: 54px;
+    }
+
+    84% {
+        width: 55px;
+        right: 0px;
+        top: 35px;
+    }
+
+    100% {
+        width: 55px;
+        right: 18px;
+        top: 48px;
+    }
+}

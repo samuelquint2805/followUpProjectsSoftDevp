@@ -1,0 +1,67 @@
+﻿@model FollowUpWorks.DTOs.EventClassDTO
+<div class="mt-5 pt-4"></div>
+<div class="container mt-4">
+   
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-plus"></i>
+            <h4 class="mb-0">Crear Nuevo Evento</h4>
+        </div>
+
+        <div class="card-body">
+            
+            <form asp-action="Create" method="post">
+
+                <!-- Título -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">
+                        <i class="bi bi-type"></i> Título
+                    </label>
+                    <input asp-for="Title" class="form-control" placeholder="Nombre del evento..." />
+                </div>
+
+                <!-- Descripción -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">
+                        <i class="bi bi-card-text"></i> Descripción
+                    </label>
+                    <textarea asp-for="Description" class="form-control" rows="4"
+                              placeholder="Descripción breve del evento..."></textarea>
+                </div>
+
+                <!-- Fecha -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">
+                        <i class="bi bi-clock-history"></i> Fecha del Evento
+                    </label>
+                    <input asp-for="EventDate" type="datetime-local" class="form-control" />
+                </div>
+
+                <!-- Lugar -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">
+                        <i class="bi bi-geo-alt"></i> Lugar
+                    </label>
+                    <input asp-for="Location" class="form-control" placeholder="Ej: Medellín, Bogotá..." />
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+                    <i class="bi bi-check-circle"></i> Guardar Evento
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Validación rápida
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function (e) {
+        const title = document.querySelector('[name="Title"]').value;
+        if (title.trim() === "") {
+            alert('El título es obligatorio');
+            e.preventDefault();
+        }
+    });
+</script>

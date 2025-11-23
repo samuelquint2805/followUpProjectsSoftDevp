@@ -1,0 +1,174 @@
+﻿@model FollowUpWorks.DTOs.ReservationClassDTO
+@{
+    ViewData["Title"] = "Nueva Reserva";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a asp-action="Index" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-calendar-plus me-2 text-primary"></i>Nueva Reserva
+                    </h1>
+                    <p class="text-muted mb-0">Completa el formulario para agendar una cita</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Formulario Principal -->
+                <div class="col-lg-7">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Datos de la Reserva</h5>
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="Create" method="post" id="reservationForm">
+                                @Html.AntiForgeryToken()
+
+                                <!-- Nombre del Cliente -->
+                                <div class="mb-4">
+                                    <label asp-for="Username" class="form-label fw-semibold">
+                                        <i class="bi bi-person me-1 text-primary"></i>Nombre del Cliente *
+                                    </label>
+                                    <input asp-for="Username" class="form-control form-control-lg"
+                                           placeholder="Ingrese el nombre completo" required />
+                                    <span asp-validation-for="Username" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Fecha y Hora -->
+                                <div class="mb-4">
+                                    <label asp-for="ReservationDate" class="form-label fw-semibold">
+                                        <i class="bi bi-calendar-event me-1 text-primary"></i>Fecha y Hora *
+                                    </label>
+                                    <input asp-for="ReservationDate" type="datetime-local"
+                                           class="form-control form-control-lg"
+                                           id="reservationDateTime" required />
+                                    <span asp-validation-for="ReservationDate" class="text-danger small"></span>
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Horario disponible: Lunes a Viernes 8:00 AM - 6:00 PM
+                                    </div>
+                                </div>
+
+                                <!-- Número de Personas -->
+                                <div class="mb-4">
+                                    <label asp-for="NumberOfGuests" class="form-label fw-semibold">
+                                        <i class="bi bi-people me-1 text-primary"></i>Número de Personas *
+                                    </label>
+                                    <div class="input-group">
+                                        <button type="button" class="btn btn-outline-secondary" id="btnDecrease">
+                                            <i class="bi bi-dash-lg"></i>
+                                        </button>
+                                        <input asp-for="NumberOfGuests" type="number"
+                                               class="form-control form-control-lg text-center"
+                                               min="1" max="20" id="guestsInput" />
+                                        <button type="button" class="btn btn-outline-secondary" id="btnIncrease">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="NumberOfGuests" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Información de Contacto -->
+                                <div class="mb-4">
+                                    <label asp-for="ContactInfo" class="form-label fw-semibold">
+                                        <i class="bi bi-telephone me-1 text-primary"></i>Información de Contacto *
+                                    </label>
+                                    <input asp-for="ContactInfo" class="form-control form-control-lg"
+                                           placeholder="Email o teléfono" required />
+                                    <span asp-validation-for="ContactInfo" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Botones -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end pt-3 border-top">
+                                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-check-circle me-2"></i>Confirmar Reserva
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Disponibilidad -->
+                <div class="col-lg-5">
+                    <!-- Resumen -->
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Resumen de Reserva</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Cliente:</span>
+                                <strong id="summaryName">-</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Fecha:</span>
+                                <strong id="summaryDate">-</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Hora:</span>
+                                <strong id="summaryTime">-</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Personas:</span>
+                                <strong id="summaryGuests">1</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Disponibilidad -->
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Horarios Disponibles Hoy</h6>
+                        </div>
+                        <div class="card-body p-2">
+                            <div class="d-flex flex-wrap gap-1" id="availableSlots">
+                                <span class="badge bg-light text-dark p-2 time-slot" data-time="08:00">08:00</span>
+                                <span class="badge bg-light text-dark p-2 time-slot" data-time="09:00">09:00</span>
+                                <span class="badge bg-light text-dark p-2 time-slot" data-time="10:00">10:00</span>
+                                <span class="badge bg-secondary p-2" title="Ocupado">11:00</span>
+                                <span class="badge bg-light text-dark p-2 time-slot" data-time="12:00">12:00</span>
+                                <span class="badge bg-light text-dark p-2 time-slot" data-time="13:00">13:00</span>
+                                <span class="badge bg-secondary p-2" title="Ocupado">14:00</span>
+                                <span class="badge bg-light text-dark p-2 time-slot" data-time="15:00">15:00</span>
+                                <span class="badge bg-light text-dark p-2 time-slot" data-time="16:00">16:00</span>
+                                <span class="badge bg-light text-dark p-2 time-slot" data-time="17:00">17:00</span>
+                            </div>
+                            <div class="mt-2 small">
+                                <span class="badge bg-light text-dark">Disponible</span>
+                                <span class="badge bg-secondary">Ocupado</span>
+                                <span class="badge bg-primary">Seleccionado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tips -->
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6><i class="bi bi-lightbulb text-warning me-2"></i>Consejos</h6>
+                            <ul class="small mb-0 ps-3">
+                                <li>Las reservas deben hacerse con al menos 24 horas de anticipación</li>
+                                <li>Para grupos mayores a 10 personas, contáctenos directamente</li>
+                                <li>Recibirá un correo de confirmación</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/ReservationScript.js"></script>
+}
+

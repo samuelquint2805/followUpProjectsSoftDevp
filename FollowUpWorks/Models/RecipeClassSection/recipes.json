@@ -1,0 +1,30 @@
+[
+  {
+    "idRecipe": "2ee1e513-c350-4a68-a593-66d6af572ae5",
+    "Id": "f55d2000-77f8-41ad-aebf-4a6aeb2b5a90",
+    "Name": "Pasta a la carbonara",
+    "Ingredients": [
+      "pasta, agua, tocino, huevo, queso parmesano"
+    ],
+    "Instructions": "asefgrgef",
+    "PreparationTimeMinutes": 5,
+    "CookingTimeMinutes": 4,
+    "Servings": 3,
+    "DishType": "Salado",
+    "MainIngredientCategory": "Pollo"
+  },
+  {
+    "idRecipe": "ebaeca41-6963-42af-b4c4-e8f1910ccab0",
+    "Id": "2d94ffa1-146a-443d-a646-53b0aaea04eb",
+    "Name": "churros",
+    "Ingredients": [
+      "harina, azucar, agua caliente, aceite"
+    ],
+    "Instructions": "mezcle todo.\r\nenfrie un poco la masa.\r\nfria por 2 minutos.\r\nespolvoree con azucar",
+    "PreparationTimeMinutes": 4,
+    "CookingTimeMinutes": 4,
+    "Servings": 3,
+    "DishType": "Dulce",
+    "MainIngredientCategory": "Granos"
+  }
+]

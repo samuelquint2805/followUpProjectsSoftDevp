@@ -1,0 +1,143 @@
+﻿@model FollowUpWorks.DTOs.NoteClassDTO
+@{
+    ViewData["Title"] = "Editar Nota";
+}
+<div class="mt-5 pt-4"></div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a asp-action="Index" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h3 mb-0">Editar Nota</h1>
+                    <p class="text-muted mb-0">Modifica tu nota</p>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post" id="formEditNote">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="idNotes" />
+
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-semibold">
+                                Título <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Title" class="form-control form-control-lg"
+                                   maxlength="100" required />
+                            <div class="d-flex justify-content-between mt-1">
+                                <span asp-validation-for="Title" class="text-danger small"></span>
+                                <small class="text-muted"><span id="titleChars">@Model.Title.Length</span>/100</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Content" class="form-label fw-semibold">
+                                Contenido <span class="text-danger">*</span>
+                            </label>
+                            <textarea asp-for="Content" class="form-control" rows="8" required></textarea>
+                            <div class="d-flex justify-content-between mt-1">
+                                <span asp-validation-for="Content" class="text-danger small"></span>
+                                <small class="text-muted">
+                                    <span id="contentChars">@Model.Content.Length</span> caracteres
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4" id="btnSubmit">
+                                    <i class="bi bi-check-lg me-2"></i>Guardar Cambios
+                                </button>
+                                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger" id="btnDelete">
+                                <i class="bi bi-trash me-1"></i>Eliminar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Eliminar -->
+<div class="modal fade" id="modalDelete" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Eliminar Nota</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Eliminar esta nota?</p>
+                <p class="text-muted small mb-0">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="@Url.Action("Delete", "Notes", new { id = Model.idNotes })" class="btn btn-danger">
+                    <i class="bi bi-trash me-1"></i>Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function() {
+            var form = document.getElementById('formEditNote');
+            var titleInput = document.getElementById('Title');
+            var contentInput = document.getElementById('Content');
+            var titleChars = document.getElementById('titleChars');
+            var contentChars = document.getElementById('contentChars');
+            var btnSubmit = document.getElementById('btnSubmit');
+            var btnDelete = document.getElementById('btnDelete');
+            var modalDelete = document.getElementById('modalDelete');
+
+            // Contador título
+            if (titleInput && titleChars) {
+                titleInput.addEventListener('input', function() {
+                    titleChars.textContent = this.value.length;
+                });
+            }
+
+            // Contador contenido
+            if (contentInput && contentChars) {
+                contentInput.addEventListener('input', function() {
+                    contentChars.textContent = this.value.length;
+                });
+            }
+
+            // Submit
+            if (form && btnSubmit) {
+                form.addEventListener('submit', function(e) {
+                    var title = titleInput ? titleInput.value.trim() : '';
+                    var content = contentInput ? contentInput.value.trim() : '';
+
+                    if (!title || !content) {
+                        e.preventDefault();
+                        alert('Completa todos los campos obligatorios');
+                        return;
+                    }
+
+                    btnSubmit.disabled = true;
+                    btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+                });
+            }
+
+            // Botón eliminar
+            if (btnDelete && modalDelete && typeof bootstrap !== 'undefined') {
+                btnDelete.addEventListener('click', function() {
+                    new bootstrap.Modal(modalDelete).show();
+                });
+            }
+        })();
+    </script>
+}

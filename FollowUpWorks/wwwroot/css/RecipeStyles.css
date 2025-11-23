@@ -1,0 +1,61 @@
+﻿
+    .bg-pink {
+    background-color: #e91e8c;
+}
+
+.bg-purple {
+    background-color: #6f42c1;
+}
+
+.recipe-row {
+    transition: background-color 0.2s;
+}
+
+    .recipe-row:hover {
+        background-color: #f8f9fa;
+    }
+
+.btn-group .btn {
+    border-radius: 0;
+}
+
+    .btn-group .btn:first-child {
+        border-radius: 0.25rem 0 0 0.25rem;
+    }
+
+    .btn-group .btn:last-child {
+        border-radius: 0 0.25rem 0.25rem 0;
+    }
+
+/* Estilos para fila expandible */
+.toggle-icon {
+    transition: transform 0.2s ease;
+    color: #6c757d;
+}
+
+.recipe-row.expanded .toggle-icon {
+    transform: rotate(90deg);
+}
+
+.instructions-container {
+    border-left: 4px solid #0d6efd;
+    animation: slideDown 0.3s ease;
+}
+
+.instructions-text {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+@@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

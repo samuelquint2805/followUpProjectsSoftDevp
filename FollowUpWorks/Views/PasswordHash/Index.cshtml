@@ -1,0 +1,241 @@
+﻿@model IEnumerable<FollowUpWorks.DTOs.PasswordHashClassDTO>
+
+@{
+    ViewData["Title"] = "Generador de Contraseñas";
+}
+<div class="mt-5 pt-4"></div>
+<div class="container mt-4">
+    <h2 class="mb-4">Generador de Contraseñas</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (ViewBag.Errors != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @ViewBag.Errors
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Nueva Contraseña</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" id="passwordForm">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Longitud de la Contraseña</label>
+                            <input type="range" class="form-range" id="lengthRange" min="4" max="64" value="16">
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small class="text-muted">4 - 64 caracteres</small>
+                                <span class="badge bg-primary fs-6" id="lengthDisplay">16</span>
+                            </div>
+                            <input type="hidden" name="Lenght" id="Lenght" value="16" />
+                            <input type="hidden" name="GeneratedPassword" id="GeneratedPassword" value="" />
+                        </div>
+
+                        <hr />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tipos de Caracteres</label>
+
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" name="IncludeUppercase" id="IncludeUppercase" value="true" checked>
+                                <label class="form-check-label" for="IncludeUppercase">
+                                    Mayusculas (A-Z)
+                                </label>
+                            </div>
+
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" name="IncludeLowercase" id="IncludeLowercase" value="true" checked>
+                                <label class="form-check-label" for="IncludeLowercase">
+                                    Minusculas (a-z)
+                                </label>
+                            </div>
+
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" name="IncludeNumbers" id="IncludeNumbers" value="true" checked>
+                                <label class="form-check-label" for="IncludeNumbers">
+                                    Numeros (0-9)
+                                </label>
+                            </div>
+
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" name="IncludeSpecialCharacters" id="IncludeSpecialCharacters" value="true" checked>
+                                <label class="form-check-label" for="IncludeSpecialCharacters">
+                                    Caracteres Especiales
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning d-none" id="warningAlert">
+                            Selecciona al menos un tipo de caracter.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+                                Generar y Guardar
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="previewBtn">
+                                Vista Previa
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-3 d-none" id="previewSection">
+                        <label class="form-label fw-bold">Vista Previa:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control font-monospace" id="previewPassword" readonly>
+                            <button class="btn btn-outline-primary" type="button" id="copyPreviewBtn">
+                                Copiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Historial de Contraseñas</h5>
+                    <span class="badge bg-light text-dark">@Model.Count() registros</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Contraseña</th>
+                                        <th class="text-center">Long.</th>
+                                        <th class="text-center">Opciones</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="input-group input-group-sm">
+                                                    <input type="password" class="form-control font-monospace password-field" value="@item.GeneratedPassword" readonly data-id="@item.idPassword" style="max-width: 200px;">
+                                                    <button class="btn btn-outline-secondary btn-toggle-visibility" type="button" data-target="@item.idPassword">
+                                                        Mostrar
+                                                    </button>
+                                                    <button class="btn btn-outline-primary btn-copy" type="button" data-target="@item.idPassword">
+                                                        Copiar
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-info">@item.Lenght</span>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (item.IncludeUppercase)
+                                                {
+                                                    <span class="badge bg-success" title="Mayusculas">A</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary" title="Mayusculas">A</span>
+                                                }
+                                                @if (item.IncludeLowercase)
+                                                {
+                                                    <span class="badge bg-success" title="Minusculas">a</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary" title="Minusculas">a</span>
+                                                }
+                                                @if (item.IncludeNumbers)
+                                                {
+                                                    <span class="badge bg-success" title="Numeros">1</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary" title="Numeros">1</span>
+                                                }
+                                                @if (item.IncludeSpecialCharacters)
+                                                {
+                                                    <span class="badge bg-success" title="Especiales">*</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary" title="Especiales">*</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm">
+                                                    <a asp-action="Details" asp-route-id="@item.idPassword" class="btn btn-info" title="Detalles">
+                                                        Ver
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@item.idPassword" class="btn btn-warning" title="Editar">
+                                                        Editar
+                                                    </a>
+                                                    <button type="button" class="btn btn-danger btn-delete" title="Eliminar" data-id="@item.idPassword">
+                                                        Eliminar
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <p class="text-muted mt-2">No hay contraseñas generadas aun.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmar Eliminacion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Esta seguro de que desea eliminar esta contraseña? Esta accion no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/PasswordHashScript.js"></script>
+}
+
