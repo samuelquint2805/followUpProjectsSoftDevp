@@ -4,27 +4,52 @@
     "Id": "f55d2000-77f8-41ad-aebf-4a6aeb2b5a90",
     "Name": "Pasta a la carbonara",
     "Ingredients": [
-      "pasta, agua, tocino, huevo, queso parmesano"
+      "pasta",
+      "queso parmesano",
+      "agua",
+      "tocino",
+      "huevo"
     ],
-    "Instructions": "asefgrgef",
-    "PreparationTimeMinutes": 5,
+    "Instructions": "asefgrgeffcffcxyft",
+    "PreparationTimeMinutes": 9,
     "CookingTimeMinutes": 4,
-    "Servings": 3,
+    "Servings": 6,
     "DishType": "Salado",
     "MainIngredientCategory": "Pollo"
   },
   {
-    "idRecipe": "ebaeca41-6963-42af-b4c4-e8f1910ccab0",
-    "Id": "2d94ffa1-146a-443d-a646-53b0aaea04eb",
-    "Name": "churros",
+    "idRecipe": "deceef9f-e69e-41b3-b218-1ea9233beea4",
+    "Id": "a2aaa289-c75d-4e30-ac43-6e2b9c439051",
+    "Name": "Pasta al pesto",
     "Ingredients": [
-      "harina, azucar, agua caliente, aceite"
+      "pasta 1 paquete",
+      "albahaca",
+      "ajo",
+      "aceite de oliva",
+      "queso parmesano",
+      "almendras"
     ],
-    "Instructions": "mezcle todo.\r\nenfrie un poco la masa.\r\nfria por 2 minutos.\r\nespolvoree con azucar",
-    "PreparationTimeMinutes": 4,
-    "CookingTimeMinutes": 4,
-    "Servings": 3,
-    "DishType": "Dulce",
+    "Instructions": "cocine todo",
+    "PreparationTimeMinutes": 20,
+    "CookingTimeMinutes": 10,
+    "Servings": 4,
+    "DishType": "Salado",
     "MainIngredientCategory": "Granos"
+  },
+  {
+    "idRecipe": "0d306cc2-240b-4087-895e-69c1b7c039a4",
+    "Id": "2831e7f4-1f8a-4c6f-af1c-2f9dbd258667",
+    "Name": "empanadas",
+    "Ingredients": [
+      "carne",
+      "masa de empanadas",
+      "aceite"
+    ],
+    "Instructions": "combinar y fritar",
+    "PreparationTimeMinutes": 5,
+    "CookingTimeMinutes": 4,
+    "Servings": 4,
+    "DishType": "Entrada",
+    "MainIngredientCategory": "Carne"
   }
 ]

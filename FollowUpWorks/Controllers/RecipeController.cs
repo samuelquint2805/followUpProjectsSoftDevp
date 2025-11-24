@@ -79,56 +79,76 @@ namespace FollowUpWorks.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Recipe/Edit/5
         [HttpGet]
         public IActionResult Edit(Guid id)
         {
-            // 1. Cargar todas las recetas
+            // Cargar todas las recetas
             var recipes = _jsonRecipes.GetAll();
 
-            // 2. Buscar la receta específica
-            var recipeToEdit = recipes.FirstOrDefault(r => r.Id == id);
+            // Buscar la receta por idRecipe (no por Id)
+            var recipeToEdit = recipes.FirstOrDefault(r => r.idRecipe == id);
 
             if (recipeToEdit == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "Receta no encontrada";
+                return RedirectToAction(nameof(Index));
             }
 
-            // Mapear el modelo (RecipeClass) al DTO para la vista (si es necesario)
+            // Mapear TODAS las propiedades al DTO
             var dto = new RecipeClassDTO
             {
                 idRecipe = recipeToEdit.idRecipe,
                 Name = recipeToEdit.Name,
-                // ... Mapear el resto de propiedades
+                Ingredients = recipeToEdit.Ingredients ?? new List<string>(),
+                Instructions = recipeToEdit.Instructions,
+                PreparationTimeMinutes = recipeToEdit.PreparationTimeMinutes,
+                CookingTimeMinutes = recipeToEdit.CookingTimeMinutes,
+                Servings = recipeToEdit.Servings,
+                DishType = recipeToEdit.DishType,
+                MainIngredientCategory = recipeToEdit.MainIngredientCategory
             };
 
             return View(dto);
         }
 
-        // --- Acción POST para guardar los cambios ---
+        // POST: Recipe/Edit
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(RecipeClassDTO recipeDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // 1. Mapear el DTO de vuelta a la clase de modelo (RecipeClass)
-                var updatedModel = new RecipeClass
-                {
-                    idRecipe = recipeDto.idRecipe,
-                    Name = recipeDto.Name,
-                    Ingredients = recipeDto.Ingredients,
-                    Instructions = recipeDto.Instructions,
-                    PreparationTimeMinutes = recipeDto.PreparationTimeMinutes,
-                    CookingTimeMinutes = recipeDto.CookingTimeMinutes,
-                    Servings = recipeDto.Servings
-                };
-
-                // 2. Llamar al servicio/repositorio para que actualice la lista y guarde el JSON
-                _jsonRecipes.UpdateRecipe(updatedModel);
-
-                return RedirectToAction("Index"); // Redirigir a la lista de recetas
+                return View(recipeDto);
             }
 
-            return View(recipeDto);
+            // Cargar todas las recetas
+            var recipes = _jsonRecipes.GetAll();
+
+            // Buscar la receta existente
+            var existingRecipe = recipes.FirstOrDefault(r => r.idRecipe == recipeDto.idRecipe);
+
+            if (existingRecipe == null)
+            {
+                TempData["ErrorMessage"] = "Receta no encontrada";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Actualizar todas las propiedades
+            existingRecipe.Name = recipeDto.Name;
+            existingRecipe.Ingredients = recipeDto.Ingredients ?? new List<string>();
+            existingRecipe.Instructions = recipeDto.Instructions;
+            existingRecipe.PreparationTimeMinutes = recipeDto.PreparationTimeMinutes;
+            existingRecipe.CookingTimeMinutes = recipeDto.CookingTimeMinutes;
+            existingRecipe.Servings = recipeDto.Servings;
+            existingRecipe.DishType = recipeDto.DishType;
+            existingRecipe.MainIngredientCategory = recipeDto.MainIngredientCategory;
+
+            // Guardar todos los cambios
+            _jsonRecipes.SaveAll(recipes);
+
+            TempData["SuccessMessage"] = "Receta actualizada exitosamente";
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
