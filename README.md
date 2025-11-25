@@ -40,6 +40,10 @@ Los proyectos están organizados en el siguiente orden:
     *   Aplicación clásica para organizar tareas pendientes (añadir, completar, eliminar).
     *   [Enlace al directorio del proyecto (ej: `./TaskListClass`)]
 
+
+## Notas
+No se manejo base de datos, ya que se utilizo almacenamiento a nivel de cache y para dos ejercicios (Recipe y reservation) se utilizo almacenamiento en JSON
+
 ***
 
 ## 🚀 Cómo Ejecutar los Proyectos Localmente
@@ -58,8 +62,6 @@ Sigue estos pasos para clonar el repositorio y ejecutar los proyectos:
     cd followUpProjectsSoftDevp
     ```
 
-
-
 ***
 
 ## 🛠 Tecnologías Utilizadas
@@ -67,6 +69,6 @@ Sigue estos pasos para clonar el repositorio y ejecutar los proyectos:
 *   HTML5
 *   CSS3 (SASS/Tailwind si aplica)
 *   JavaScript (ES6+)
-*   [Añadir otros frameworks/librerías si se usan, ej: React, Firebase]
+
  
     
